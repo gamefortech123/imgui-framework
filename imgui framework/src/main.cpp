@@ -17,7 +17,8 @@ ImVec2& g_crosshairSize = Config::Add("crosshair", "Sizes", Config::Type::IMVEC2
 
 ImFont* g_pLargeFont = nullptr;
 
-struct ImageTex {
+struct ImageTex
+{
 	std::string m_name;
 	PDIRECT3DTEXTURE9 m_texture;
 	int m_width;
@@ -103,17 +104,16 @@ void RenderUI() {
 
 		} ImGui::End();
 	}
-	
+
 	// render other windows here that should be displayed regardless of menu being open or not
 	POINT mPos;
 	GetCursorPos(&mPos);
-
 	ImGui::Begin("info window"); {
 
 		if (!g_open) {
 			auto pos = ImGui::GetWindowPos();
 			auto size = ImGui::GetWindowSize();
-			
+
 			bool isHovering = mPos.x >= pos.x && mPos.y >= pos.y && mPos.x <= (pos.x + size.x) && mPos.y <= (pos.y + size.y);
 
 			if (!g_toggledInput && isHovering) {
@@ -136,11 +136,10 @@ void RenderUI() {
 	} ImGui::End();
 
 	// render background overlay widgets
-	auto* pBgDrawList = ImGui::GetBackgroundDrawList();
+	auto* bg_drawlist = ImGui::GetBackgroundDrawList();
 	ImGui::PushFont(g_pLargeFont);
-
-#pragma region overlay_info
-	if (g_bInfoOverlay) {
+	if (g_bInfoOverlay)
+	{
 		std::vector<std::pair<std::string, ImColor>> overlayInfoText = {
 			{"mouse positions: " + std::to_string(mPos.x) + ", " + std::to_string(mPos.y), ImColor(255, 0, 0)},
 			{"This is an overlay for information", ImColor(0, 255, 0)},
@@ -161,69 +160,16 @@ void RenderUI() {
 
 		ImVec2 bgStart = { (float)startPosX - padding, padding * 0.5f };
 		ImVec2 bgEnd = { bgStart.x + maxSize.x + (padding * 2), bgStart.y + (overlayInfoText.size() * maxSize.y) + padding };
-		pBgDrawList->AddRectFilled(bgStart, bgEnd, ImColor(11, 11, 11, 225));
-
-		for (int i = 0; i < overlayInfoText.size(); i++) {
-			pBgDrawList->AddText({ (float)startPosX, padding + (i * maxSize.y) }, overlayInfoText[i].second, overlayInfoText[i].first.c_str());
+		bg_drawlist->AddRectFilled(bgStart, bgEnd, ImColor(11, 11, 11, 225));
+		for (int i = 0; i < overlayInfoText.size(); i++)
+		{
+			bg_drawlist->AddText({ (float)startPosX, padding + (i * maxSize.y) }, overlayInfoText[i].second, overlayInfoText[i].first.c_str());
 		}
 	}
-#pragma endregion
-
-	if (g_bCrosshair && g_pActiveCrosshair) {
-		auto windowSize = GAPI::GetWindowSize();
-		ImVec2 start = { (windowSize.x - g_crosshairSize.x) / 2.f, (windowSize.y - g_crosshairSize.y) / 2.f };
-		ImVec2 end = { start.x + g_crosshairSize.x, start.y + g_crosshairSize.y };
-		pBgDrawList->AddImage(g_pActiveCrosshair->m_texture, start, end);
-	}
-	
 	ImGui::PopFont();
 }
-
-void GameThread() {
-	while (true) {
-		printf("tick\n");
-		
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	}
-}
-
-DWORD Init(LPVOID lpParam) {
-	AllocConsole();
-	FILE* _dummy;
-	freopen_s(&_dummy, "CONOUT$", "w", stdout);
-
-	Config::Load();
-	
-
-	//std::thread([]() { GameThread(); }).detach();
-
-	GAPI::MakeWindow(
-		L"hook_with_imgui", // window title
-		L"c_hook_with_imgui", // window class
-		WndProc,
-		InitUI,
-		RenderUI,
-		&g_open,
-		&g_menuKeyBind
-	);
-
-	return 1;
-}
-
-BOOL WINAPI DllMain(
-	HINSTANCE hInstDll,
-	DWORD dwReason,
-	LPVOID lpReserved
-) {
-	switch (dwReason) {
-	case DLL_PROCESS_ATTACH:
-		DisableThreadLibraryCalls(hInstDll);
-		CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Init, NULL, NULL, NULL);
-		break;
-	default:
-		return FALSE;
-		break;
-	}
-
+auto main() -> int
+{
+	GAPI::MakeWindow(L"hook_with_imgui", L"c_hook_with_imgui", WndProc, InitUI, RenderUI, &g_open, &g_menuKeyBind);
 	return TRUE;
 }

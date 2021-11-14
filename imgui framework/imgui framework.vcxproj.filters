@@ -317,14 +317,14 @@
     <ClCompile Include="vendor\ImGui\imgui_widgets.cpp">
       <Filter>vendor\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\utils.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
     <ClCompile Include="src\widgets\widgets.cpp">
       <Filter>src\widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

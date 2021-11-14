@@ -110,7 +110,7 @@
     <ClInclude Include="vendor\ImGui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\utils\utils.cpp" />
     <ClCompile Include="src\widgets\widgets.cpp" />
     <ClCompile Include="vendor\ImGui\imgui.cpp" />
